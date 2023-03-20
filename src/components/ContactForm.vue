@@ -1,38 +1,71 @@
 <template>
-    <Form @submit="submitContact" :validation-schema="contactFormSchema">
-        <div class="form-group">
-            <label for="name">Tên</label>
-            <Field name="name" type="text" class="form-control" v-model="contactLocal.name" />
-            <ErrorMessage name="name" class="error-feedback" />
-        </div>
-        <div class="form-group">
-            <label for="email">E-mail</label>
-            <Field name="email" type="email" class="form-control" v-model="contactLocal.email" />
-            <ErrorMessage name="email" class="error-feedback" />
-        </div>
-        <div class="form-group">
-            <label for="address">Địa chỉ</label>
-            <Field name="address" type="text" class="form-control" v-model="contactLocal.address" />
-            <ErrorMessage name="address" class="error-feedback" />
-        </div>
-        <div class="form-group">
-            <label for="phone">Điện thoại</label>
-            <Field name="phone" type="tel" class="form-control" v-model="contactLocal.phone" />
-            <ErrorMessage name="phone" class="error-feedback" />
-        </div>
-        <div class="form-group form-check">
-            <input name="favorite" type="checkbox" class="form-check-input" v-model="contactLocal.favorite" />
-            <label for="favorite" class="form-check-label">
-                <strong>Liên hệ yêu thích</strong>
-            </label>
-        </div>
-        <div class="form-group">
-            <button type="submit" class="btn btn-primary">Lưu</button>
-            <button v-if="contactLocal._id" type="button" class="ml-2 btn btn-danger" @click="deleteContact">
-                Xóa
-            </button>
-        </div>
-    </Form>
+    <div>
+        <Form v-if="contactLocal" @submit="submitContact" :validation-schema="contactFormSchema">
+            <div class="form-group">
+                <label for="name">Tên</label>
+                <Field name="name" type="text" class="form-control" v-model="contactLocal.name" />
+                <ErrorMessage name="name" class="error-feedback" />
+            </div>
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <Field name="email" type="email" class="form-control" v-model="contactLocal.email" />
+                <ErrorMessage name="email" class="error-feedback" />
+            </div>
+            <div class="form-group">
+                <label for="address">Địa chỉ</label>
+                <Field name="address" type="text" class="form-control" v-model="contactLocal.address" />
+                <ErrorMessage name="address" class="error-feedback" />
+            </div>
+            <div class="form-group">
+                <label for="phone">Điện thoại</label>
+                <Field name="phone" type="tel" class="form-control" v-model="contactLocal.phone" />
+                <ErrorMessage name="phone" class="error-feedback" />
+            </div>
+            <div class="form-group form-check">
+                <input name="favorite" type="checkbox" class="form-check-input" v-model="contactLocal.favorite" />
+                <label for="favorite" class="form-check-label">
+                    <strong>Liên hệ yêu thích</strong>
+                </label>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Lưu</button>
+                <button v-if="contactLocal._id" type="button" class="ml-2 btn btn-danger" @click="deleteContact">
+                    Xóa
+                </button>
+            </div>
+        </Form>
+        <Form v-else @submit="createContact" :validation-schema="contactFormSchema">
+            <div class="form-group">
+                <label for="name">Tên</label>
+                <Field name="name" type="text" class="form-control" v-model="name" />
+                <ErrorMessage name="name" class="error-feedback" />
+            </div>
+            <div class="form-group">
+                <label for="email">E-mail</label>
+                <Field name="email" type="email" class="form-control" v-model="email" />
+                <ErrorMessage name="email" class="error-feedback" />
+            </div>
+            <div class="form-group">
+                <label for="address">Địa chỉ</label>
+                <Field name="address" type="text" class="form-control" v-model="address" />
+                <ErrorMessage name="address" class="error-feedback" />
+            </div>
+            <div class="form-group">
+                <label for="phone">Điện thoại</label>
+                <Field name="phone" type="tel" class="form-control" v-model="phone" />
+                <ErrorMessage name="phone" class="error-feedback" />
+            </div>
+            <div class="form-group form-check">
+                <input name="favorite" type="checkbox" class="form-check-input" v-model="favorite" />
+                <label for="favorite" class="form-check-label">
+                    <strong>Liên hệ yêu thích</strong>
+                </label>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary">Lưu</button>
+            </div>
+        </Form>
+    </div>
 </template>
 
 <script>
@@ -44,7 +77,7 @@ export default {
         Field,
         ErrorMessage,
     },
-    emits: ["submit:contact", "delete:contact"],
+    emits: ["submit:contact", "delete:contact", "create:contact"],
     props: {
         contact: { type: Object, required: true }
     },
@@ -70,13 +103,28 @@ export default {
         return {
             // Chúng ta sẽ không muốn hiệu chỉnh props, nên tạo biến cục bộ
             // contactLocal để liên kết với các input trên form
-            contactLocal: this.contact,
+            contactLocal: this.contact ? this.contact : '',
             contactFormSchema,
+            name: '',
+            email: '',
+            address: '',
+            phone: '',
+            favorite: false,
         }
     },
     methods: {
         submitContact() {
             this.$emit("submit:contact", this.contactLocal);
+        },
+        createContact() {
+            const data = {
+                name: this.name,
+                email: this.email,
+                address: this.address,
+                phone: this.phone,
+                favorite: this.favorite
+            }
+            this.$emit("create:contact", data);
         },
         deleteContact() {
             this.$emit("delete:contact", this.contactLocal.id);
